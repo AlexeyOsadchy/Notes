@@ -58,9 +58,11 @@ public class ListNotesPresenterImpl<V extends ListNotesActivityMvp>
 
     @Override
     public void onClickNote(int position) {
-        Note note = currentNotes.get(position);
-        note.setClickedPosition(position);
-        mMvpView.openNote(note);
+        if(position >= 0) {
+            Note note = currentNotes.get(position);
+            note.setClickedPosition(position);
+            mMvpView.openNote(note);
+        }
     }
 
     private void changedNote(Note note) {

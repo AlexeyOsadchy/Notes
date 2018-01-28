@@ -4,17 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.widget.EditText;
 
 import com.alexeyosadchy.android.notes.R;
 
-public class NoteActivity extends FragmentActivity {
+public class NoteActivity extends FragmentActivity implements NoteDetailFragment.Callback{
 
     public static final String EXTRA_KEY_TEXT_OF_NOTE = "com.alexeyosadchy.android.notes.TEXT";
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
-
-    EditText editText;
-    Note note;
 
     NoteDetailFragment noteDetailFragment;
 
@@ -28,25 +26,28 @@ public class NoteActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_detail);
-        note = (Note) getIntent().getParcelableExtra(EXTRA_KEY_TEXT_OF_NOTE);
+        Note note = (Note) getIntent().getParcelableExtra(EXTRA_KEY_TEXT_OF_NOTE);
 
-//        if (savedInstanceState == null) {
-//            noteDetailFragment = NoteDetailFragment.newInstance(item);
-//            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//            ft.replace(R.id.flDetailContainer, noteDetailFragment);
-//            ft.commit();
-//        }
+        if (savedInstanceState == null) {
+            noteDetailFragment = NoteDetailFragment.newInstance(note);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.flDetailContainer, noteDetailFragment);
+            ft.commit();
+        }
+    }
 
-        editText = (EditText) findViewById(R.id.editText_note);
-        editText.setText(note.getDescription());
-        editText.setSelection(note.getDescription().length());
+    @Override
+    public void noteUpdate(Note note) {
+
     }
 
     @Override
     public void onBackPressed() {
-        note.setDescription(editText.getText().toString());
-        setResult(RESULT_OK, new Intent().putExtra(EXTRA_KEY_TRANSFER_NOTE, note));
-        finish();
+        Note note = noteDetailFragment.saveNote();
+        if(note != null) {
+            setResult(RESULT_OK, new Intent().putExtra(EXTRA_KEY_TRANSFER_NOTE, note));
+            finish();
+        }
         super.onBackPressed();
     }
 }

@@ -80,6 +80,9 @@ public class ListNotesPresenterImpl<V extends ListNotesActivityMvp>
 
     @Override
     public void onActivityResult(Note note) {
+        if(note == null){
+            return;
+        }
         if (note.getId() == 0 && !note.getDescription().isEmpty()) {
             newNote(note);
         } else if (note.getId() > 0 && !note.getDescription().isEmpty()) {

@@ -1,5 +1,6 @@
 package com.alexeyosadchy.android.notes.view;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,36 @@ public class NoteDetailFragment extends Fragment {
         editText.setSelection(note.getDescription().length());
 
         return v;
+    }
+
+    private Callback mCallback;
+
+    public interface Callback {
+        void noteUpdate(Note note);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof Callback) {
+            mCallback = (Callback) activity;
+        } else {
+            throw new ClassCastException(activity.toString()
+                    + " must implement ItemsListFragment.OnItemSelectedListener");
+        }
+    }
+
+    protected Note saveNote(){
+        if(!note.getDescription().equals(editText.getText().toString())){
+            note.setDescription(editText.getText().toString());
+            return note;
+        } else return null;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
     }
 
     public static NoteDetailFragment newInstance(Note note) {

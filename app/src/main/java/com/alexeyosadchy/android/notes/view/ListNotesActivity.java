@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener {
+public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener, NoteDetailFragment.Callback {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1001;
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
@@ -30,7 +30,7 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
     private boolean isTwoPane = false;
 
     ListNotesFragment listNotesFragment;
-
+    NoteDetailFragment noteDetailFragment;
     @Inject
     ListNotesPresenter<ListNotesActivityMvp> mPresenter;
 
@@ -44,8 +44,15 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
                 .activityModule(new ActivityModule(this))
                 .build();
         mActivityComponent.inject(this);
+        listNotesFragment =
+                (ListNotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentItemsList);
         determinePaneLayout();
         init();
+    }
+
+    @Override
+    public void noteUpdate(Note note) {
+
     }
 
     @Override
@@ -72,9 +79,6 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
         FrameLayout fragmentItemDetail = (FrameLayout) findViewById(R.id.flDetailContainer);
         if (fragmentItemDetail != null) {
             isTwoPane = true;
-            listNotesFragment =
-                    (ListNotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentItemsList);
-            //listNotesFragment.setActivateOnItemClick(true);
         }
     }
 
@@ -101,9 +105,12 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
     @Override
     public void openNote(Note note) {
         if (isTwoPane) {
-            NoteDetailFragment fragmentItem = NoteDetailFragment.newInstance(note);
+            if(noteDetailFragment != null){
+                mPresenter.onActivityResult(noteDetailFragment.saveNote());
+            }
+            noteDetailFragment = NoteDetailFragment.newInstance(note);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.flDetailContainer, fragmentItem);
+            ft.replace(R.id.flDetailContainer, noteDetailFragment);
             ft.commit();
         } else {
             navigator.navigateToNoteScreen(this, REQUEST_CODE_EDIT_NOTE, note);

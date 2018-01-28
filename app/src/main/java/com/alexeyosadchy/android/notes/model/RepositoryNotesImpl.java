@@ -45,4 +45,10 @@ public class RepositoryNotesImpl implements RepositoryNotes {
     public void deleteNote(Long id) {
         mEntityNoteDao.deleteByKey(id);
     }
+
+    private void putFakeData(){
+        EntityNote en = new EntityNote();
+        en.setText("Fake note");
+        mEntityNoteDao.insert(en);
+    }
 }

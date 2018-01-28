@@ -2,14 +2,8 @@ package com.alexeyosadchy.android.notes.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
+import android.support.v4.app.FragmentTransaction;
 import android.widget.FrameLayout;
 
 import com.alexeyosadchy.android.notes.App;
@@ -18,14 +12,13 @@ import com.alexeyosadchy.android.notes.di.component.ActivityComponent;
 import com.alexeyosadchy.android.notes.di.component.DaggerActivityComponent;
 import com.alexeyosadchy.android.notes.di.module.ActivityModule;
 import com.alexeyosadchy.android.notes.presenter.ListNotesPresenter;
-import com.alexeyosadchy.android.notes.view.adapter.NoteAdapter;
 import com.alexeyosadchy.android.notes.view.navigation.Navigator;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp {
+public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1001;
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
@@ -34,12 +27,9 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
     public Navigator navigator;
     protected ActivityComponent mActivityComponent;
 
-    private FloatingActionButton mFloatingActionButton;
-    private RecyclerView mNotesRecyclerView;
-    private LinearLayoutManager mLinearLayoutManager;
-    private NoteAdapter mNoteAdapter;
-
     private boolean isTwoPane = false;
+
+    ListNotesFragment listNotesFragment;
 
     @Inject
     ListNotesPresenter<ListNotesActivityMvp> mPresenter;
@@ -55,14 +45,34 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
                 .build();
         mActivityComponent.inject(this);
         determinePaneLayout();
-        //init();
+        init();
+    }
+
+    @Override
+    public void prepareView(List<Note> notes) {
+        listNotesFragment.prepareView(notes);
+    }
+
+    @Override
+    public void onLongClick(int position) {
+        mPresenter.onLongClickNote(position);
+    }
+
+    @Override
+    public void onClick(int position) {
+        mPresenter.onClickNote(position);
+    }
+
+    @Override
+    public void onFabClick() {
+        mPresenter.onClickFloatingActionBtn();
     }
 
     private void determinePaneLayout() {
         FrameLayout fragmentItemDetail = (FrameLayout) findViewById(R.id.flDetailContainer);
         if (fragmentItemDetail != null) {
             isTwoPane = true;
-            ListNotesFragment listNotesFragment =
+            listNotesFragment =
                     (ListNotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentItemsList);
             //listNotesFragment.setActivateOnItemClick(true);
         }
@@ -75,39 +85,29 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
 
     @Override
     public void updateList(List<Note> notes, int position) {
-        mNoteAdapter.notifyItemChanged(position);
-        mNoteAdapter.notifyDataSetChanged();
+        listNotesFragment.updateList(notes, position);
     }
 
     @Override
     public void updateList(int position) {
-        mNoteAdapter.notifyItemRemoved(position);
+        listNotesFragment.updateList(position);
     }
 
     @Override
     public void updateList() {
-        mNoteAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void prepareView(List<Note> notes) {
-        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.button_add);
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mPresenter.onClickFloatingActionBtn();
-            }
-        });
-        mNotesRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_notes);
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        mNoteAdapter = new NoteAdapter(notes, mPresenter);
-        mNotesRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mNotesRecyclerView.setAdapter(mNoteAdapter);
+        listNotesFragment.updateList();
     }
 
     @Override
     public void openNote(Note note) {
-        navigator.navigateToNoteScreen(this, REQUEST_CODE_EDIT_NOTE, note);
+        if (isTwoPane) {
+            NoteDetailFragment fragmentItem = NoteDetailFragment.newInstance(note);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.flDetailContainer, fragmentItem);
+            ft.commit();
+        } else {
+            navigator.navigateToNoteScreen(this, REQUEST_CODE_EDIT_NOTE, note);
+        }
     }
 
     @Override
@@ -124,13 +124,4 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
         super.onDestroy();
         mPresenter.onDetach();
     }
-
-//    FragmentManager fm = getSupportFragmentManager();
-//    Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-//        if (fragment == null) {
-//        fragment = createFragment();
-//        fm.beginTransaction()
-//                .add(R.id.fragment_container, fragment)
-//                .commit();
-//    }
 }

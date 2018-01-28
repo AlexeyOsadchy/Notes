@@ -7,20 +7,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.alexeyosadchy.android.notes.R;
-import com.alexeyosadchy.android.notes.presenter.ListNotesPresenter;
-import com.alexeyosadchy.android.notes.view.ListNotesActivityMvp;
+import com.alexeyosadchy.android.notes.view.ListNotesFragment;
 import com.alexeyosadchy.android.notes.view.Note;
 
 import java.util.List;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder> {
 
-    private ListNotesPresenter<ListNotesActivityMvp> mPresenter;
+    private ListNotesFragment.OnItemSelectedListener mListener;
     private List<Note> mNotes;
 
-    public NoteAdapter(List<Note> notes, ListNotesPresenter<ListNotesActivityMvp> presenter){
+    public NoteAdapter(List<Note> notes, ListNotesFragment.OnItemSelectedListener listener) {
         mNotes = notes;
-        mPresenter = presenter;
+        mListener = listener;
     }
 
     @Override
@@ -39,7 +38,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder> {
         return mNotes.size();
     }
 
-    public class NoteHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener{
+    public class NoteHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
 
         private TextView mDescription;
 
@@ -53,13 +52,13 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder> {
 
         @Override
         public boolean onLongClick(View view) {
-            mPresenter.onLongClickNote(getAdapterPosition());
+            mListener.onLongClick(getAdapterPosition());
             return false;
         }
 
         @Override
         public void onClick(View view) {
-            mPresenter.onClickNote(getAdapterPosition());
+            mListener.onClick(getAdapterPosition());
         }
     }
 }

@@ -2,10 +2,8 @@ package com.alexeyosadchy.android.notes.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.widget.EditText;
 
 import com.alexeyosadchy.android.notes.R;
@@ -30,7 +28,7 @@ public class NoteActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_detail);
-        note = (Note)getIntent().getParcelableExtra(EXTRA_KEY_TEXT_OF_NOTE);
+        note = (Note) getIntent().getParcelableExtra(EXTRA_KEY_TEXT_OF_NOTE);
 
 //        if (savedInstanceState == null) {
 //            noteDetailFragment = NoteDetailFragment.newInstance(item);
@@ -38,8 +36,6 @@ public class NoteActivity extends FragmentActivity {
 //            ft.replace(R.id.flDetailContainer, noteDetailFragment);
 //            ft.commit();
 //        }
-
-
 
         editText = (EditText) findViewById(R.id.editText_note);
         editText.setText(note.getDescription());
@@ -53,6 +49,4 @@ public class NoteActivity extends FragmentActivity {
         finish();
         super.onBackPressed();
     }
-
-
 }

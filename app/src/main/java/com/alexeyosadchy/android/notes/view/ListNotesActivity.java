@@ -3,10 +3,14 @@ package com.alexeyosadchy.android.notes.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.alexeyosadchy.android.notes.App;
 import com.alexeyosadchy.android.notes.R;
@@ -21,7 +25,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ListNotesActivity extends AppCompatActivity implements ListNotesActivityMvp {
+public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1001;
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
@@ -35,20 +39,33 @@ public class ListNotesActivity extends AppCompatActivity implements ListNotesAct
     private LinearLayoutManager mLinearLayoutManager;
     private NoteAdapter mNoteAdapter;
 
+    private boolean isTwoPane = false;
+
     @Inject
     ListNotesPresenter<ListNotesActivityMvp> mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_notes);
+        setContentView(R.layout.activity_container);
 
         mActivityComponent = DaggerActivityComponent.builder()
                 .applicationComponent(((App) getApplication()).getApplicationComponent())
                 .activityModule(new ActivityModule(this))
                 .build();
         mActivityComponent.inject(this);
-        init();
+        determinePaneLayout();
+        //init();
+    }
+
+    private void determinePaneLayout() {
+        FrameLayout fragmentItemDetail = (FrameLayout) findViewById(R.id.flDetailContainer);
+        if (fragmentItemDetail != null) {
+            isTwoPane = true;
+            ListNotesFragment listNotesFragment =
+                    (ListNotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentItemsList);
+            //listNotesFragment.setActivateOnItemClick(true);
+        }
     }
 
     private void init() {
@@ -107,4 +124,13 @@ public class ListNotesActivity extends AppCompatActivity implements ListNotesAct
         super.onDestroy();
         mPresenter.onDetach();
     }
+
+//    FragmentManager fm = getSupportFragmentManager();
+//    Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+//        if (fragment == null) {
+//        fragment = createFragment();
+//        fm.beginTransaction()
+//                .add(R.id.fragment_container, fragment)
+//                .commit();
+//    }
 }

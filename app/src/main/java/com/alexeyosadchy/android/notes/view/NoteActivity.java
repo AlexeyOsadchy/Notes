@@ -2,21 +2,23 @@ package com.alexeyosadchy.android.notes.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
 
 import com.alexeyosadchy.android.notes.R;
 
-import butterknife.BindView;
-
-public class NoteActivity extends AppCompatActivity {
+public class NoteActivity extends FragmentActivity {
 
     public static final String EXTRA_KEY_TEXT_OF_NOTE = "com.alexeyosadchy.android.notes.TEXT";
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
-    //@BindView(R.id.editText_note)
+
     EditText editText;
     Note note;
+
+    NoteDetailFragment noteDetailFragment;
 
     public static Intent getCallingIntent(Context context, Note note) {
         Intent intent = new Intent(context, NoteActivity.class);
@@ -27,8 +29,18 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note);
+        setContentView(R.layout.activity_note_detail);
         note = (Note)getIntent().getParcelableExtra(EXTRA_KEY_TEXT_OF_NOTE);
+
+//        if (savedInstanceState == null) {
+//            noteDetailFragment = NoteDetailFragment.newInstance(item);
+//            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//            ft.replace(R.id.flDetailContainer, noteDetailFragment);
+//            ft.commit();
+//        }
+
+
+
         editText = (EditText) findViewById(R.id.editText_note);
         editText.setText(note.getDescription());
         editText.setSelection(note.getDescription().length());

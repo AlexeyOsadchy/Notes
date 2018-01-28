@@ -71,11 +71,11 @@ public class ListNotesPresenterImpl<V extends ListNotesActivityMvp>
 
 
     private void newNote(Note note) {
-        repositoryNotes.addNote(Mapper.convertToEntityNote(note)).subscribe(key -> {
+        getCompositeDisposable().add(repositoryNotes.addNote(Mapper.convertToEntityNote(note)).subscribe(key -> {
             note.setId(key);
             currentNotes.add(note);
             mMvpView.updateList();
-        });
+        }));
     }
 
     @Override

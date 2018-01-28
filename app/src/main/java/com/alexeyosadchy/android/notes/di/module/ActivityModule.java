@@ -1,6 +1,7 @@
 package com.alexeyosadchy.android.notes.di.module;
 
 import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 
 import com.alexeyosadchy.android.notes.di.ActivityContext;
@@ -23,9 +24,9 @@ import io.reactivex.disposables.CompositeDisposable;
 @Module
 public class ActivityModule {
 
-    private AppCompatActivity mActivity;
+    private FragmentActivity mActivity;
 
-    public ActivityModule(AppCompatActivity mActivity) {
+    public ActivityModule(FragmentActivity mActivity) {
         this.mActivity = mActivity;
     }
 

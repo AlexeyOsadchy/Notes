@@ -45,9 +45,7 @@ public class ListNotesPresenterImpl<V extends ListNotesActivityMvp>
 
     @Override
     public void onLongClickNote(int position) {
-        repositoryNotes.deleteNote(currentNotes.get(position).getId());
-        currentNotes.remove(position);
-        mMvpView.updateList(position);
+        deleteNote(position);
     }
 
     @Override
@@ -61,6 +59,12 @@ public class ListNotesPresenterImpl<V extends ListNotesActivityMvp>
         Note note = currentNotes.get(position);
         note.setClickedPosition(position);
         mMvpView.openNote(note);
+    }
+
+    private void deleteNote(int position){
+        repositoryNotes.deleteNote(currentNotes.get(position).getId());
+        currentNotes.remove(position);
+        mMvpView.updateList(position);
     }
 
     private void changedNote(Note note) {
@@ -80,15 +84,12 @@ public class ListNotesPresenterImpl<V extends ListNotesActivityMvp>
 
     @Override
     public void onActivityResult(Note note) {
-        if(note == null){
-            return;
-        }
         if (note.getId() == 0 && !note.getDescription().isEmpty()) {
             newNote(note);
         } else if (note.getId() > 0 && !note.getDescription().isEmpty()) {
             changedNote(note);
         } else if (note.getId() > 0 && note.getDescription().isEmpty()) {
-            onLongClickNote(note.getClickedPosition());
+            deleteNote(note.getClickedPosition());
         }
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener, NoteDetailFragment.Callback {
+public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1001;
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
@@ -31,6 +31,7 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
 
     ListNotesFragment listNotesFragment;
     NoteDetailFragment noteDetailFragment;
+
     @Inject
     ListNotesPresenter<ListNotesActivityMvp> mPresenter;
 
@@ -47,12 +48,8 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
         listNotesFragment =
                 (ListNotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentItemsList);
         determinePaneLayout();
+        noteDetailFragment = (NoteDetailFragment) getSupportFragmentManager().findFragmentById(R.id.flDetailContainer);
         init();
-    }
-
-    @Override
-    public void noteUpdate(Note note) {
-
     }
 
     @Override

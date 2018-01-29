@@ -5,16 +5,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.widget.EditText;
 
 import com.alexeyosadchy.android.notes.R;
 
-public class NoteActivity extends FragmentActivity implements NoteDetailFragment.Callback{
+public class NoteActivity extends FragmentActivity {
 
     public static final String EXTRA_KEY_TEXT_OF_NOTE = "com.alexeyosadchy.android.notes.TEXT";
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
 
-    NoteDetailFragment noteDetailFragment;
+    private NoteDetailFragment noteDetailFragment;
 
     public static Intent getCallingIntent(Context context, Note note) {
         Intent intent = new Intent(context, NoteActivity.class);
@@ -31,23 +30,17 @@ public class NoteActivity extends FragmentActivity implements NoteDetailFragment
         if (savedInstanceState == null) {
             noteDetailFragment = NoteDetailFragment.newInstance(note);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.flDetailContainer, noteDetailFragment);
-            ft.commit();
+            ft.replace(R.id.flDetailContainer, noteDetailFragment).commit();
         }
-    }
-
-    @Override
-    public void noteUpdate(Note note) {
-
     }
 
     @Override
     public void onBackPressed() {
-        Note note = noteDetailFragment.saveNote();
-        if(note != null) {
-            setResult(RESULT_OK, new Intent().putExtra(EXTRA_KEY_TRANSFER_NOTE, note));
-            finish();
+        if (noteDetailFragment == null) {
+            noteDetailFragment = (NoteDetailFragment) getSupportFragmentManager().findFragmentById(R.id.flDetailContainer);
         }
+        setResult(RESULT_OK, new Intent().putExtra(EXTRA_KEY_TRANSFER_NOTE, noteDetailFragment.saveNote()));
+        finish();
         super.onBackPressed();
     }
 }

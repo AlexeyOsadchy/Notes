@@ -2,8 +2,11 @@ package com.alexeyosadchy.android.notes.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.alexeyosadchy.android.notes.App;
@@ -18,7 +21,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ListNotesActivity extends FragmentActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener {
+public class ListNotesActivity extends AppCompatActivity implements ListNotesActivityMvp, ListNotesFragment.OnItemSelectedListener {
 
     private static final int REQUEST_CODE_EDIT_NOTE = 1001;
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
@@ -59,6 +62,12 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
 
     @Override
     public void onLongClick(int position) {
+        //mPresenter.onLongClickNote(position);
+        cancelItem.setVisible(true);
+    }
+
+    @Override
+    public void removeNotes(int position) {
         mPresenter.onLongClickNote(position);
     }
 
@@ -123,9 +132,44 @@ public class ListNotesActivity extends FragmentActivity implements ListNotesActi
         }
     }
 
+    MenuItem cancelItem;
+    MenuItem removeItem;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_activity_list_notes, menu);
+        cancelItem = menu.findItem(R.id.action_cancel);
+        removeItem = menu.findItem(R.id.action_remove);
+        cancelItem.setVisible(false);
+        removeItem.setVisible(false);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.equals(cancelItem)){
+            listNotesFragment.onCancelMenuItemClick();
+        } else if(item.equals(removeItem)){
+            listNotesFragment.onRemoveMenuItemClick();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mPresenter.onDetach();
+    }
+
+    @Override
+    public void showCancelMenuItem() {
+        cancelItem.setVisible(true);
+        removeItem.setVisible(true);
+    }
+
+    @Override
+    public void hideCancelMenuItem() {
+        cancelItem.setVisible(false);
+        removeItem.setVisible(false);
     }
 }

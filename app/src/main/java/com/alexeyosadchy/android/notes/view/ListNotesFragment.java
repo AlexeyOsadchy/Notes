@@ -33,15 +33,6 @@ public class ListNotesFragment extends Fragment {
         mFloatingActionButton = (FloatingActionButton) v.findViewById(R.id.button_add);
         mNotesRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view_notes);
 
-        List<Note> list = new ArrayList<>();
-        list.add(new Note(1, "ds sdfdsf"));
-        list.add(new Note(2, "3  g32g2 3"));
-        list.add(new Note(3, "ds syu r jrt  er gsf"));
-        list.add(new Note(4, "ds s65 43dsf"));
-        list.add(new Note(5, "ds sd232535325 2"));
-        list.add(new Note(6, "ds s346 3 34sf"));
-        //prepareView(list);
-
         return v;
     }
 
@@ -51,6 +42,9 @@ public class ListNotesFragment extends Fragment {
         void onLongClick(int position);
         void onClick(int position);
         void onFabClick();
+        void showCancelMenuItem();
+        void hideCancelMenuItem();
+        void removeNotes(int position);
     }
 
     @Override
@@ -86,8 +80,8 @@ public class ListNotesFragment extends Fragment {
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //mPresenter.onClickFloatingActionBtn();
                 listener.onFabClick();
+
             }
         });
 
@@ -95,5 +89,26 @@ public class ListNotesFragment extends Fragment {
         mNoteAdapter = new NoteAdapter(notes, listener);
         mNotesRecyclerView.setLayoutManager(mLinearLayoutManager);
         mNotesRecyclerView.setAdapter(mNoteAdapter);
+    }
+
+    public void onCancelMenuItemClick(){
+        for(int i = 0;  i < mNoteAdapter.listOfclickedItem.length; i++){
+            mNoteAdapter.listOfclickedItem[i] = false;
+        }
+        mNoteAdapter.notifyDataSetChanged();
+        mNoteAdapter.multipleMode = false;
+        listener.hideCancelMenuItem();
+        mFloatingActionButton.show();
+    }
+
+    public void onRemoveMenuItemClick(){
+        for(int i = mNoteAdapter.listOfclickedItem.length - 1; i >= 0; i--){
+            if(mNoteAdapter.listOfclickedItem[i] == true){
+                listener.removeNotes(i);
+            }
+        }
+        mNoteAdapter.multipleMode = false;
+        listener.hideCancelMenuItem();
+        mFloatingActionButton.show();
     }
 }

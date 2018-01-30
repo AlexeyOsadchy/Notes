@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 
 import com.alexeyosadchy.android.notes.R;
 
-public class NoteActivity extends FragmentActivity {
+public class NoteActivity extends AppCompatActivity {
 
     public static final String EXTRA_KEY_TEXT_OF_NOTE = "com.alexeyosadchy.android.notes.TEXT";
     private static final String EXTRA_KEY_TRANSFER_NOTE = "com.alexeyosadchy.android.TRANSFER_NOTE";
